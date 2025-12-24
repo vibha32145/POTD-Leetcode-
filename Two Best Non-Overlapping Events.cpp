@@ -1,0 +1,43 @@
+int maxTwoEvents(vector<vector<int>>& events) {
+          int n = events.size();
+    
+    // Sort by start time
+    sort(events.begin(), events.end());
+
+    // Suffix max array
+    vector<int> suffixMax(n);
+    suffixMax[n-1] = events[n-1][2];
+
+    for (int i = n - 2; i >= 0; i--) {
+        suffixMax[i] = max(suffixMax[i + 1], events[i][2]);
+    }
+
+    int ans = 0;
+
+    for (int i = 0; i < n; i++) {
+        int currValue = events[i][2];
+        int nextStart = events[i][1] + 1;
+
+        // Binary search for next non-overlapping event
+        int l = i + 1, r = n - 1;
+        int idx = -1;
+
+        while (l <= r) {
+            int mid = (l + r) / 2;
+            if (events[mid][0] >= nextStart) {
+                idx = mid;
+                r = mid - 1;
+            } else {
+                l = mid + 1;
+            }
+        }
+
+        if (idx != -1) {
+            currValue += suffixMax[idx];
+        }
+
+        ans = max(ans, currValue);
+    }
+
+    return ans;
+    }
